@@ -1,0 +1,5 @@
+si ya tienes normalizado la base de datos, data first (estudiar),a dominio le damos la extension que una BD no puedes hacer
+el dominio es en lo que esta basado en lo que se va a construir pero primeramente sabemos que va a hacer el programa
+el dominio son todas las tablas que usaremos
+
+Los DTO son para salidas de datos o consultas que queremos ver, nos ayuda a mapear la BD

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporizador con Preguntas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f0f0;
+        }
+        #container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #timer {
+            font-size: 48px;
+            margin: 20px 0;
+            color: #333;
+        }
+        #question {
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            transition: background-color 0.5s, transform 0.5s;
+        }
+        .flash {
+            background-color: #ff0000 !important;
+            color: white !important;
+            transform: scale(1.2);
+            animation: flashAnimation 1s;
+        }
+        @keyframes flashAnimation {
+            0% { background-color: #ff0000; }
+            50% { background-color: #ff9900; }
+            100% { background-color: #e0e0e0; color: #333; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Temporizador con Cambio de Preguntas</h1>
+        <label for="timeInput">Ingresa el tiempo total en segundos:</label><br>
+        <input type="number" id="timeInput" placeholder="Ej: 120" min="1"><br>
+        <button onclick="startTimer()">Iniciar</button>
+        <div id="timer">--:--</div>
+        <div id="question">Pregunta actual: 1</div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let questionInterval;
+        let timeLeft;
+        let questionNumber = 1;
+        let bellSound;
+
+        function startTimer() {
+            const input = document.getElementById('timeInput').value;
+            if (!input || input <= 0) {
+                alert('Por favor, ingresa un tiempo válido mayor a 0.');
+                return;
+            }
+
+            timeLeft = parseInt(input);
+            questionNumber = 1;
+            updateQuestionDisplay();
+            updateTimerDisplay();
+
+            clearInterval(timerInterval);
+            clearInterval(questionInterval);
+
+            timerInterval = setInterval(countdown, 1000);
+
+            // Iniciar el cambio de pregunta cada 30 segundos, empezando después de los primeros 30s
+            questionInterval = setInterval(changeQuestion, 30000);
+
+            // Cargar el sonido local (asegúrate de que el archivo CP.mp3 esté en la misma carpeta que este HTML)
+            bellSound = new Audio('CP.mp3');
+            // Nota: En algunos navegadores, el sonido podría no reproducirse automáticamente sin interacción del usuario.
+            // Para probar, asegúrate de que el sitio permita audio autoplay o interactúa con la página.
+        }
+
+        function countdown() {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateTimerDisplay();
+            } else {
+                clearInterval(timerInterval);
+                clearInterval(questionInterval);
+                alert('¡Tiempo terminado!');
+            }
+        }
+
+        function changeQuestion() {
+            if (timeLeft > 0) {
+                questionNumber++;
+                updateQuestionDisplay();
+                flashQuestion();
+                playBellSound();
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateQuestionDisplay() {
+            document.getElementById('question').textContent = `Pasa a la pregunta: ${questionNumber}`;
+        }
+
+        function flashQuestion() {
+            const questionElem = document.getElementById('question');
+            questionElem.classList.add('flash');
+            setTimeout(() => {
+                questionElem.classList.remove('flash');
+            }, 1000); // Duración de la animación
+        }
+
+        function playBellSound() {
+            if (bellSound) {
+                bellSound.currentTime = 0; // Reiniciar al inicio cada vez
+                bellSound.play().catch(error => {
+                    console.log('Error al reproducir el sonido:', error);
+                });
+                // Detener después de 4 segundos
+                setTimeout(() => {
+                    bellSound.pause();
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
